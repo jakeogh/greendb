@@ -106,18 +106,26 @@ class CommandError(Exception):
 
 
 Error = namedtuple('Error', ('message',))
-class Attributes(object):
+
+
+class Attributes():
     __slots__ = ('data',)
+
     def __init__(self, data=None):
         self.data = data or {}
+
     def __repr__(self):
         return '<Attributes: %r>' % self.data
+
     def __getitem__(self, key):
         return self.data[key]
+
     def __iter__(self):
         return iter(self.data.items())
+
     def __len__(self):
         return len(self.data)
+
 ProcessingInstruction = namedtuple('ProcessingInstruction', ('op', 'value'))
 VerbatimString = namedtuple('VerbatimString', ('text', 'prefix'))
 
@@ -136,7 +144,7 @@ MAXINT = 1 << 63
 READSIZE = 4 * 1024
 
 
-class _Socket(object):
+class _Socket():
     def __init__(self, s):
         self._socket = s
         self.is_closed = False
@@ -289,7 +297,7 @@ class _Socket(object):
         return True
 
 
-class ProtocolHandler(object):
+class ProtocolHandler():
     def __init__(self):
         self.handlers = {
             b'*': self.handle_array,
@@ -464,7 +472,7 @@ class ProtocolHandler(object):
 DEFAULT_MAP_SIZE = 1024 * 1024 * 256  # 256MB.
 
 
-class Storage(object):
+class Storage():
     def __init__(self, path, map_size=DEFAULT_MAP_SIZE, read_only=False,
                  metasync=True, sync=False, writemap=False, map_async=False,
                  meminit=True, max_dbs=16, max_spare_txns=64, lock=True,
@@ -572,7 +580,7 @@ class Storage(object):
         return self.env.sync(force)
 
 
-class Connection(object):
+class Connection():
     def __init__(self, storage, sock):
         self.storage = storage
         self.sock = sock
@@ -623,7 +631,7 @@ def requires_dupsort(meth):
     return verify_dupsort
 
 
-class Server(object):
+class Server():
     def __init__(self, host='127.0.0.1', port=31337, max_clients=1024,
                  path='data', **storage_config):
         self._host = host
@@ -1162,7 +1170,7 @@ class Server(object):
         return self._commands[command](client, *data[1:])
 
 
-class SocketPool(object):
+class SocketPool():
     def __init__(self, host, port, timeout=60, max_age=None):
         self.host = host
         self.port = port
@@ -1218,7 +1226,7 @@ class SocketPool(object):
         return False
 
 
-class _ConnectionState(object):
+class _ConnectionState():
     def __init__(self, **kwargs):
         super(_ConnectionState, self).__init__(**kwargs)
         self.reset()
@@ -1228,7 +1236,7 @@ class _ConnectionState(object):
 class _ConnectionLocal(_ConnectionState, greenlet_local): pass
 
 
-class Client(object):
+class Client():
     def __init__(self, host='127.0.0.1', port=31337, decode_keys=False,
                  timeout=60, pool=True, max_age=None):
         self.host = host
