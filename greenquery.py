@@ -1,10 +1,9 @@
 import datetime
 import struct
-import sys
+#import sys
 import time
 
 from greendb import Client
-
 
 __all__ = [
     'Client',
@@ -18,17 +17,12 @@ __all__ = [
 ]
 
 
-if sys.version_info[0] == 2:
-    unicode_type = unicode
-else:
-    unicode_type = str
-
-
-class Node(object):
+class Node():
     def __init__(self):
         self.negated = False
 
-    def _e(op, inv=False):
+    @staticmethod
+    def _e(op: str, inv: bool = False):
         """
         Lightweight factory which returns a method that builds an Expression
         consisting of the left-hand and right-hand operands, using `op`.
@@ -51,8 +45,7 @@ class Node(object):
     __ge__ = _e('>=')
 
     def between(self, start, stop, start_inclusive=True, stop_inclusive=False):
-        return Expression(self, 'between', (start, stop, start_inclusive,
-                                            stop_inclusive))
+        return Expression(self, 'between', (start, stop, start_inclusive, stop_inclusive))
 
     def startswith(self, prefix):
         return Expression(self, 'startswith', prefix)
@@ -65,13 +58,13 @@ class Expression(Node):
         self.rhs = rhs
 
     def __repr__(self):
-        return '<Expression: %s %s %s>' % (self.lhs, self.op, self.rhs)
+        return f'<Expression: {self.lhs} {self.op} {self.rhs}>'
 
 
 def encode(s):
     if isinstance(s, bytes):
         return s
-    elif isinstance(s, unicode_type):
+    if isinstance(s, str):    # py3 unicode
         return s.encode('utf8')
     return str(s).encode('utf8')
 
@@ -306,8 +299,7 @@ class Model(with_metaclass(DeclarativeMeta)):
     def load(cls, primary_key):
         data = cls._read_model_data(primary_key)
         if data is None:
-            raise KeyError('%s with id=%s not found' %
-                           (cls._meta.name, primary_key))
+            raise KeyError('%s with id=%s not found' % (cls._meta.name, primary_key))
         return cls(**data)
 
     def save(self):

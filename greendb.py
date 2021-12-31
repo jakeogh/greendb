@@ -1,24 +1,9 @@
 #!/usr/bin/env python
 
-from __future__ import unicode_literals  # Required for 2.x compatability.
+# from __future__ import unicode_literals  # Required for 2.x compatability.
 
-import gevent
-from gevent import socket
-from gevent.local import local as greenlet_local
-from gevent.pool import Pool
-from gevent.server import StreamServer
-from gevent.thread import get_ident
-
-import lmdb
-from msgpack import packb as msgpack_packb
-from msgpack import unpackb as msgpack_unpackb
-
-from collections import namedtuple
-from contextlib import contextmanager
-from functools import wraps
-from io import BytesIO
-from socket import error as socket_error
-import datetime
+# from socket import error as socket_error
+# import datetime
 import heapq
 import json
 import logging
@@ -27,32 +12,42 @@ import optparse
 import os
 import re
 import shutil
-import sys
-import struct
+# import sys
+# import struct
 import time
+from collections import namedtuple
+from contextlib import contextmanager
+from functools import wraps
+from io import BytesIO
 
+import gevent
+import lmdb
+from gevent import socket
+from gevent.local import local as greenlet_local
+from gevent.pool import Pool
+from gevent.server import StreamServer
+from gevent.thread import get_ident
+from msgpack import packb as msgpack_packb
+from msgpack import unpackb as msgpack_unpackb
 
 __version__ = '0.2.3'
 
 logger = logging.getLogger(__name__)
 
 
-if sys.version_info[0] == 3:
-    unicode = str
-    basestring = (bytes, str)
-    int_types = int
-    use_buffers = True
-else:
-    int_types = (int, long)
-    use_buffers = False
+unicode = str
+basestring = (bytes, str)
+int_types = int
+use_buffers = True
+
 
 def encode(s):
     if isinstance(s, unicode):
         return s.encode('utf-8')
-    elif isinstance(s, bytes):
+    if isinstance(s, bytes):
         return s
-    else:
-        return str(s).encode('utf-8')
+    return str(s).encode('utf-8')
+
 
 def encode_bulk_dict(d):
     accum = {}
@@ -60,16 +55,18 @@ def encode_bulk_dict(d):
         accum[encode(key)] = value
     return accum
 
+
 def encode_bulk_list(l):
     return [encode(k) for k in l]
+
 
 def decode(s):
     if isinstance(s, unicode):
         return s
-    elif isinstance(s, bytes):
+    if isinstance(s, bytes):
         return s.decode('utf-8')
-    else:
-        return str(s)
+    return str(s)
+
 
 def decode_bulk_dict(d):
     accum = {}
@@ -78,17 +75,31 @@ def decode_bulk_dict(d):
     return accum
 
 
-class ClientQuit(Exception): pass
-class Shutdown(Exception): pass
+class ClientQuit(Exception):
+    pass
 
-class ServerError(Exception): pass
-class ConnectionError(ServerError): pass
-class ServerInternalError(ServerError): pass
+
+class Shutdown(Exception):
+    pass
+
+
+class ServerError(Exception):
+    pass
+
+
+class ConnectionError(ServerError):
+    pass
+
+
+class ServerInternalError(ServerError):
+    pass
+
 
 class CommandError(Exception):
     def __init__(self, message):
         self.message = message
         super(CommandError, self).__init__()
+
     def __str__(self):
         return self.message
     __unicode__ = __str__
@@ -343,7 +354,7 @@ class ProtocolHandler(object):
         next_byte = sock.read(1)
         if next_byte == b't' or next_byte == b'T':
             return True
-        elif next_byte == b'f' or next_byte == b'F':
+        if next_byte == b'f' or next_byte == b'F':
             return False
         raise ValueError('unsupported value for boolean type')
 
@@ -450,7 +461,6 @@ class ProtocolHandler(object):
             raise ValueError('unrecognized type')
 
 
-
 DEFAULT_MAP_SIZE = 1024 * 1024 * 256  # 256MB.
 
 
@@ -515,9 +525,9 @@ class Storage(object):
         return self.open()
 
     def get_storage_config(self):
-        config = {'path': self._path, 'dupsort': self._dupsort}
-        config.update(self._config)  # Add LMDB config.
-        return config
+        _config = {'path': self._path, 'dupsort': self._dupsort}
+        _config.update(self._config)  # Add LMDB config.
+        return _config
 
     def stat(self):
         return self.env.stat()
@@ -1147,8 +1157,7 @@ class Server(object):
         command = data[0].upper()
         if command not in self._commands:
             raise CommandError('Unrecognized command: %s' % command)
-        else:
-            logger.debug('Received %s', decode(command))
+        logger.debug('Received %s', decode(command))
 
         return self._commands[command](client, *data[1:])
 
@@ -1299,7 +1308,8 @@ class Client(object):
         else:
             return resp
 
-    def command(cmd, close_conn=False):
+    @staticmethod
+    def command(cmd: str, close_conn: bool = False):
         def method(self, *args, **kwargs):
             return self.execute(encode(cmd), args, close_conn, **kwargs)
         return method
