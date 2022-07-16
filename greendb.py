@@ -1050,6 +1050,8 @@ class Server:
         return accum
 
     def getrange(self, client, start=None, stop=None, count=None):
+        logger.info(f"getrange(): {client} {start} {stop} {count}")
+
         def cb(cursor):
             key, value = cursor.item()
             return key, (key, munpackb(value))
