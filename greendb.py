@@ -1022,6 +1022,8 @@ class Server:
         return n
 
     def _cursor_op(self, client, start, stop, count, cb, stopcond=operator.gt):
+        logger.info(f"{client} {start} {stop} {count} {cb} {operator.gt}")
+
         accum = []
         if count is None:
             count = 0
