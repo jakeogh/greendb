@@ -1066,7 +1066,7 @@ class Server:
             key, value = cursor.item()
             return key, (key, munpackb(value))
 
-        return self._cursor_op(client, start, stop, count, cb, prefix)
+        return self._cursor_op(client, start, stop, count, cb, operator.gt, prefix)
 
     @requires_dupsort
     def getrangedupraw(self, client, key, start=None, stop=None, count=None):
