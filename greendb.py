@@ -1024,9 +1024,9 @@ class Server:
     def _cursor_op(
         self, client, start, stop, count, cb, stopcond=operator.gt, prefix: bool = False
     ):
-        logger.info(
-            f"_cursor_op(): {client} {start} {stop} {count} {cb} {operator.gt}, {prefix}"
-        )
+        # logger.info(
+        #    f"_cursor_op(): {client} {start} {stop} {count} {cb} {operator.gt}, {prefix}"
+        # )
 
         accum = []
         if count is None:
@@ -1042,9 +1042,9 @@ class Server:
 
             while True:
                 key, data = cb(cursor)
-                logger.info(
-                    f"_cursor_op() while True: {key} {key.tobytes()} {data} {start} {prefix}"
-                )
+                # logger.info(
+                #    f"_cursor_op() while True: {key} {key.tobytes()} {data} {start} {prefix}"
+                # )
                 if use_buffers:
                     key = key.tobytes()
                 if stop is not None and stopcond(key, stop):
@@ -1060,7 +1060,7 @@ class Server:
         return accum
 
     def getrange(self, client, start=None, stop=None, count=None, prefix=False):
-        logger.info(f"getrange(): {client} {start} {stop} {count} {prefix}")
+        # logger.info(f"getrange(): {client} {start} {stop} {count} {prefix}")
 
         def cb(cursor):
             key, value = cursor.item()
