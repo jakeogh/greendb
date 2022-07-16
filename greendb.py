@@ -1055,14 +1055,14 @@ class Server:
 
         return accum
 
-    def getrange(self, client, start=None, stop=None, count=None):
+    def getrange(self, client, start=None, stop=None, count=None, prefix=False):
         logger.info(f"getrange(): {client} {start} {stop} {count}")
 
         def cb(cursor):
             key, value = cursor.item()
             return key, (key, munpackb(value))
 
-        return self._cursor_op(client, start, stop, count, cb)
+        return self._cursor_op(client, start, stop, count, cb, prefix)
 
     @requires_dupsort
     def getrangedupraw(self, client, key, start=None, stop=None, count=None):
