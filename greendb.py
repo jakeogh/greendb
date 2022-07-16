@@ -1021,7 +1021,9 @@ class Server:
 
         return n
 
-    def _cursor_op(self, client, start, stop, count, cb, stopcond=operator.gt):
+    def _cursor_op(
+        self, client, start, stop, count, cb, stopcond=operator.gt, prefix: bool = False
+    ):
         logger.info(f"_cursor_op(): {client} {start} {stop} {count} {cb} {operator.gt}")
 
         accum = []
@@ -1043,6 +1045,9 @@ class Server:
                     key = key.tobytes()
                 if stop is not None and stopcond(key, stop):
                     break
+                if prefix:
+                    if not key.startswith(start):
+                        break
                 accum.append(data)
                 count -= 1
                 if count == 0 or not cursor.next():
