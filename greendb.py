@@ -1050,7 +1050,7 @@ class Server:
                 if stop is not None and stopcond(key, stop):
                     break
                 if prefix:
-                    if not key.tobytes().startswith(start):
+                    if not key.startswith(start):
                         break
                 accum.append(data)
                 count -= 1
