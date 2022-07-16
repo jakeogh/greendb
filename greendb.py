@@ -1040,7 +1040,7 @@ class Server:
 
             while True:
                 key, data = cb(cursor)
-                logger.info(f"_cursor_op() while True: {key} {data}")
+                logger.info(f"_cursor_op() while True: {key} {key.tobytes()} {data}")
                 if use_buffers:
                     key = key.tobytes()
                 if stop is not None and stopcond(key, stop):
